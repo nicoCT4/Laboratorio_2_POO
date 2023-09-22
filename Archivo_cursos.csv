@@ -1,0 +1,6 @@
+﻿id_curso;id_sede;nombre_curso;horario;duracion;dias
+97;2205;Claculo;10:00;30m;Lunes
+98;9005;Fisica;07:00;40;Lunes
+101;7010;Algebra;13:00;60;Martes
+103;2210;Programacion;12:00;60;Martes
+207;7005;Estadistica;17:00;70;Jueves
