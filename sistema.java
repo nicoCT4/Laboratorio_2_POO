@@ -2,32 +2,31 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
-public class sistema {
-    private ArrayList<salon> salones;
-    private ArrayList<curso> cursos;
+public class Sistema {
+    private ArrayList<Salon> salones;
+    private ArrayList<Curso> cursos;
 
-    public sistema() {
+    public Sistema() {
         this.salones = new ArrayList<>();
         this.cursos = new ArrayList<>();
     }
 
     // Método para cargar el archivo de salones
-    public void cargarsalones(String archivosalones) {
+    public void cargarSalones(String archivoSalones) {
         try {
-            BufferedReader br = new BufferedReader(new FileReader(archivosalones));
+            BufferedReader br = new BufferedReader(new FileReader(archivoSalones));
             String linea;
 
             while ((linea = br.readLine()) != null) {
-                String[] datossalon = linea.split(";");
-                int idSede = Integer.parseInt(datossalon[0]);
-                char edificio = datossalon[1].charAt(0);
-                int nivel = Integer.parseInt(datossalon[2]);
-                int idsalon = Integer.parseInt(datossalon[3]);
-                int capacidad = Integer.parseInt(datossalon[4]);
+                String[] datosSalon = linea.split(";");
+                int idSede = Integer.parseInt(datosSalon[0]);
+                char edificio = datosSalon[1].charAt(0);
+                int nivel = Integer.parseInt(datosSalon[2]);
+                int idSalon = Integer.parseInt(datosSalon[3]);
+                int capacidad = Integer.parseInt(datosSalon[4]);
 
-                salon salon = new salon(idSede, edificio, nivel, idsalon, capacidad);
+                Salon salon = new Salon(idSede, edificio, nivel, idSalon, capacidad);
                 salones.add(salon);
             }
 
@@ -52,7 +51,11 @@ public class sistema {
                 int duracion = Integer.parseInt(datosCurso[4]);
                 String dias = datosCurso[5];
 
-                curso curso = new curso(idCurso, idSede, nombreCurso, duracion, idSede, dias, duracion);
+                String[] horarioSplit = horario.split("-");
+                int horaInicio = Integer.parseInt(horarioSplit[0]);
+                int horaFin = Integer.parseInt(horarioSplit[1]);
+                Horario horarioCurso = new Horario(horario, horaInicio, horaFin);
+                Curso curso = new Curso(idCurso, idSede, nombreCurso, duracion, horarioCurso, dias, duracion);
                 cursos.add(curso);
             }
 
@@ -63,30 +66,35 @@ public class sistema {
     }
 
     // Método para asignar un curso a un salón
-    public boolean asignarCursoAsalon(curso curso, salon salon) {
+    public boolean asignarCursoASalon(Curso curso, Salon salon) {
         // Verificar condiciones de asignación
         if (curso.getIdSede() != salon.getSede()) {
             System.out.println("El curso y el salón no pertenecen a la misma sede.");
             return false;
         }
-
-        // Verificar disponibilidad de horario en el salón (debes implementar esta lógica)
-
+    
         if (curso.getCantidadEstudiantes() > salon.getCapacidad()) {
             System.out.println("El salón no tiene suficiente capacidad para el curso.");
             return false;
         }
-
-        // Si pasa todas las verificaciones, asignar el curso al salón
+    
+        // Verificar disponibilidad de horario
+        if (!salon.horarioDisponible(curso.getHorario())) {
+            System.out.println("El curso no se puede asignar debido a una superposición de horarios.");
+            return false;
+        }
+    
+        // Si se cumplen todas las condiciones, asignar el curso al salón
         salon.agregarCurso(curso);
         return true;
     }
+    
 
     // Método para consultar un salón por id de sede, edificio, nivel y número de salón
-    public salon consultarsalon(int idSede, char edificio, int nivel, int idsalon) {
-        for (salon salon : salones) {
+    public Salon consultarSalon(int idSede, char edificio, int nivel, int idSalon) {
+        for (Salon salon : salones) {
             if (salon.getSede() == idSede && salon.getEdificio() == edificio &&
-                salon.getNivel() == nivel && salon.getSalon() == idsalon) {
+                salon.getNivel() == nivel && salon.getSalon() == idSalon) {
                 return salon; // Se encontró el salón
             }
         }
@@ -95,8 +103,8 @@ public class sistema {
     }
 
     // Método para consultar un curso por su id
-    public curso consultarCurso(int idCurso) {
-        for (curso curso : cursos) {
+    public Curso consultarCurso(int idCurso) {
+        for (Curso curso : cursos) {
             if (curso.getIdCurso() == idCurso) {
                 return curso; // Se encontró el curso
             }
@@ -108,18 +116,18 @@ public class sistema {
     // Método para generar un informe
     public void generarInforme() {
         System.out.println("Cursos Asignados:");
-        for (salon salon : salones) {
+        for (Salon salon : salones) {
             System.out.println("Salón " + salon.getSalon() + ":");
-            for (curso curso : salon.getCursosAsignados()) {
+            for (Curso curso : salon.getCursosAsignados()) {
                 System.out.println(" - " + curso.getNombre() + " (" + curso.getIdCurso() + ")");
             }
         }
 
         System.out.println("\nCursos No Asignados:");
-        for (curso curso : cursos) {
+        for (Curso curso : cursos) {
             boolean asignado = false;
-            for (salon salon : salones) {
-                if (salon.horarioDisponible(curso)) {
+            for (Salon salon : salones) {
+                if (salon.horarioDisponible(curso.getHorario())) {
                     asignado = true;
                     break;
                 }
@@ -129,4 +137,14 @@ public class sistema {
             }
         }
     }
+    public Salon consultarSalonPorSede(int idSede) {
+        for (Salon salon : salones) {
+            if (salon.getSede() == idSede) {
+                return salon; // Se encontró un salón en la sede especificada
+            }
+        }
+        System.out.println("No se encontró ningún salón en la sede especificada.");
+        return null; // No se encontró un salón en la sede especificada
+    }
+    
 }

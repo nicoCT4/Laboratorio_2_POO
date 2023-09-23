@@ -1,14 +1,15 @@
-public class curso {
+
+public class Curso {
     private int idCurso;
     private int idSede;
     private String nombre;
     private int duracion;
-    private int horario;
+    private Horario horario;
     private String dias;
     private int cantidadEstudiantes;
 
     // Constructor
-    public curso(int idCurso, int idSede, String nombre, int duracion, int horario, String dias, int cantidadEstudiantes) {
+    public Curso(int idCurso, int idSede, String nombre, int duracion, Horario horario, String dias, int cantidadEstudiantes) {
         this.idCurso = idCurso;
         this.idSede = idSede;
         this.nombre = nombre;
@@ -42,13 +43,12 @@ public class curso {
     public String getNombre() {
         return nombre;
     }
+    public Horario getHorario() {
+        return horario;
+    }
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
-
-    // Otros getters y setters para los demás atributos
-
-    // Otros métodos según las necesidades de tu aplicación
 }
 
